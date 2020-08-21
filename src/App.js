@@ -18,13 +18,13 @@ class App extends React.Component {
     leaderboard: [],
     players: [],
     score: [],
-    showModal: false
+    showModal: false,
   };
 
   snapState = { ...this.state };
 
   resetState = () => {
-    this.setState({ ...this.snapState })
+    this.setState({ ...this.snapState });
   };
 
   handleToUpdate(someArg) {
@@ -37,39 +37,47 @@ class App extends React.Component {
     this.setState({ score: score });
   };
 
-
   handleOpenModal = () => {
     this.setState({ showModal: true });
-  }
+  };
   handleCloseModal = () => {
     this.setState({ showModal: false });
-  }
+  };
+
   deletePlayer = (index) => {
     const newPlayers = [...this.state.players];
-    newPlayers.splice(index, 1)
-    this.setState({ players: newPlayers })
-
-  }
+    newPlayers.splice(index, 1);
+    this.setState({ players: newPlayers });
+  };
 
   render() {
     return (
       <>
         <nav>
-          <button onClick={() => {
-            if (window.confirm("Are you sure? Going home will end current quiz!")) {
+          <i class="fas fa-brain fa-lg">
+            <span>TB</span>
+          </i>
+          <button
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Are you sure? Going home will end current quiz!"
+                )
+              ) {
+                this.setState({ score: [] }, () => {
+                  this.resetState();
+                });
+                this.props.history.push("/");
 
-              this.setState({ score: [] }, () => {
-                this.resetState();
-
-              })
-              this.props.history.push("/")
-
-              // location.reload();
-              console.log("Home")
-            } else {
-              console.log("Cancelled")
-            }
-          }}>Home</button>
+                // location.reload();
+                console.log("Home");
+              } else {
+                console.log("Cancelled");
+              }
+            }}
+          >
+            Home
+          </button>
           <button onClick={this.handleOpenModal}>Instructions</button>
         </nav>
 
@@ -80,8 +88,6 @@ class App extends React.Component {
           <InstructionsComponent onClick={this.handleCloseModal.bind(this)} />
         </ReactModal>
 
-
-
         <Switch>
           <Route
             id="path1"
@@ -90,18 +96,29 @@ class App extends React.Component {
             render={() => (
               <>
                 <section id="welcomePage">
-                  <h1>TriviaBoss</h1>
-                  <h3><em>The quiz where everyone's an expert!</em></h3>
-                  <AnchorLink href="#addPlayerButton">
-                    <button>Start quiz</button>
-                  </AnchorLink>
+                  <div id="welcomeBox">
+                    <h1>
+                      TriviaBoss{" "}
+                      <span>
+                        <i class="fas fa-brain fa-lg" />
+                      </span>
+                    </h1>
+                    <h3>
+                      <em>The quiz where everyone's an expert!</em>
+                    </h3>
+                    <AnchorLink href="#questionForm">
+                      <button>Start quiz</button>
+                    </AnchorLink>
+                  </div>
                 </section>
 
-                <InputContainer
-                  handleToUpdate={this.handleToUpdate.bind(this)}
-                  players={this.state.players}
-                  deletePlayer={this.deletePlayer.bind(this)}
-                />
+                <section id="inputPage">
+                  <InputContainer
+                    handleToUpdate={this.handleToUpdate.bind(this)}
+                    players={this.state.players}
+                    deletePlayer={this.deletePlayer.bind(this)}
+                  />
+                </section>
               </>
             )}
           />
@@ -110,7 +127,6 @@ class App extends React.Component {
             path="/questions"
             render={() => (
               <QuestionContainer
-                //{...props}
                 state={this.state}
                 finalScore={this.finalScore.bind(this)}
               />
@@ -130,13 +146,8 @@ class App extends React.Component {
 
           <Route
             id="path404"
-            render={() => (
-              <Error404
-                resetState={this.resetState.bind(this)}
-              />
-            )}
+            render={() => <Error404 resetState={this.resetState.bind(this)} />}
           ></Route>
-
         </Switch>
       </>
     );

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import QuestionComponent from "../Components/QuestionComponent";
-import PopupComponent from "../Components/PopupComponent"
+import PopupComponent from "../Components/PopupComponent";
 import { Redirect } from "react-router-dom";
 
 //let counter = 0;
@@ -8,10 +8,14 @@ import { Redirect } from "react-router-dom";
 class QuestionContainer extends Component {
   state = this.props.state;
 
-  snapState = {};
-  resetState = () => {
-    return this.setState({...this.snapState})
-  }
+  snapState = {
+    playerCount: 0,
+    questionCount: 0,
+    leaderboard: [],
+    players: [],
+    score: [],
+    showModal: false,
+  };
 
   componentDidMount() {
     let scoreArr = [];
@@ -24,36 +28,36 @@ class QuestionContainer extends Component {
 
   componentWillUnmount() {
     this.props.finalScore(this.state.score);
-    this.resetState();
   }
 
   changeQuestionHandler = (event) => {
     event.preventDefault();
-    
-      console.log(
-        `Player: ${this.state.playerCount + 1}, Question: ${
-          this.state.questionCount + 1
-        }`
-      );
-      if (
-        this.state.questionCount + 1 <
-        this.state.players[this.state.playerCount].questions.length
-      ) {
-        this.setState((prev) => ({ questionCount: ++prev.questionCount }));
-      } else if (this.state.playerCount + 1 < this.state.players.length) {
-        this.setState({ questionCount: 0 });
 
-        this.setState((prev) => {
-          return { playerCount: ++prev.playerCount };
-        });
-      } else {
-        this.setState({ redirect: true });
-        console.log("Quiz End");
-      }
+    console.log(
+      `Player: ${this.state.playerCount + 1}, Question: ${
+        this.state.questionCount + 1
+      }`
+    );
 
-      // Function to check if answer is correct
-      this.checkAnswer(event.target.answer.value);
-      event.target.reset();
+    // I the user has answered less questions than the total number of questions
+    if (
+      this.state.questionCount + 1 <
+      this.state.players[this.state.playerCount].questions.length
+    ) {
+      this.setState((prev) => ({ questionCount: ++prev.questionCount }));
+    } else if (this.state.playerCount + 1 < this.state.players.length) {
+      this.setState({ questionCount: 0 });
+      this.setState((prev) => {
+        return { playerCount: ++prev.playerCount };
+      });
+    } else {
+      this.setState({ redirect: true });
+      console.log("Quiz End");
+    }
+
+    // Function to check if answer is correct
+    this.checkAnswer(event.target.answer.value);
+    event.target.reset();
   };
 
   checkAnswer = (answer) => {
@@ -61,8 +65,8 @@ class QuestionContainer extends Component {
       this.state.questionCount
     ].correct_answer;
     let newScore = [...this.state.score];
-    let positive_muliplier
-    let negative_muliplier
+    let positive_muliplier;
+    let negative_muliplier;
 
     switch (this.state.players[this.state.playerCount].difficulty) {
       case "medium":
@@ -82,7 +86,7 @@ class QuestionContainer extends Component {
     if (answer === corrAns) {
       newScore[this.state.playerCount] += 100 * positive_muliplier;
     } else {
-      newScore[this.state.playerCount] -= 100 * negative_muliplier
+      newScore[this.state.playerCount] -= 100 * negative_muliplier;
     }
     this.setState(
       {
@@ -90,24 +94,29 @@ class QuestionContainer extends Component {
       },
       () => console.log(this.state.score)
     );
-    
   };
 
   render() {
-    //It's running everything twice?
-    //counter = counter + 1;
+
     if (this.state.redirect){
+
       return (
         <div>
-          <Redirect to="/results"/>
+          <Redirect id="#redirect" to="/results" />
         </div>
-      )
+      );
     } else {
       if (this.state.questionCount === 0) {
         return (
-          <div>
-            <PopupComponent player = {this.state.players[this.state.playerCount].name}/>
+          <div id="questions">
+            <PopupComponent
+              id="newPlayerModal"
+              player={this.state.players[this.state.playerCount].name}
+              topic={this.state.players[this.state.playerCount].topic}
+              difficulty={this.state.players[this.state.playerCount].difficulty}
+            />
             <QuestionComponent
+              id="questionComponent"
               on_submit={this.changeQuestionHandler}
               question_no={this.state.questionCount + 1}
               name={this.state.players[this.state.playerCount].name}
@@ -128,11 +137,12 @@ class QuestionContainer extends Component {
               }
             />
           </div>
-        )
+        );
       } else {
         return (
-          <div>
+          <div id="questions">
             <QuestionComponent
+              id="questionComponent"
               on_submit={this.changeQuestionHandler}
               question_no={this.state.questionCount + 1}
               name={this.state.players[this.state.playerCount].name}
