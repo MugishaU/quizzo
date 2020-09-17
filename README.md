@@ -2,7 +2,7 @@
 
 ## Run Deployed Version
 - Open [this link](https://trivia-boss.netlify.app/)
-## Run ILocal Version
+## Run Local Version
 
 - Click "Use this template" at the top of this repo
 - Follow repo setup instructions
